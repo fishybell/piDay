@@ -1,4 +1,4 @@
-main
-gin-bin
-app
+*/main
+*/gin-bin
+*/app
 .gitignore
