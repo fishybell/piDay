@@ -45,13 +45,13 @@
 <p>Drag the slider to display the current value.</p>
 
 <div class="slidecontainer">
-  <input type="range" min="0" max="100" value="0" class="slider" id="myRange1">
+  <input type="range" min="-100" max="100" value="0" class="slider" id="myRange1">
   <p>Value: <span id="demo1"></span></p>
 </div>
 
 
 <div class="slidecontainer">
-  <input type="range" min="0" max="100" value="0" class="slider" id="myRange2">
+  <input type="range" min="-100" max="100" value="0" class="slider" id="myRange2">
   <p>Value: <span id="demo2"></span></p>
 </div>
 
@@ -71,7 +71,7 @@ slider1.oninput = function() {
   var headers = {
     'Content-Type': 'application/json',
   }
-  var url = `${address}/api/robots/hello/commands/speed`
+  var url = `${address}/api/robots/car/commands/speed`
 
   // jquery wants to make these url parameters...which doesn't work with gobot
   $.post(url, JSON.stringify(data), function(data, status) {

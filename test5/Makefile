@@ -1,3 +1,5 @@
+.PHONY: static
+
 default: build copy
 
 build:
