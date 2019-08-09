@@ -54,7 +54,7 @@ func parseInt(something map[string]interface{}, param string) int64 {
 	}
 }
 
-func watchForShutdown(pwm *pwmDriver, hbridges ...*gpio.LedDriver) {
+func watchForShutdown(pwms []*pwmDriver, hbridges ...*gpio.LedDriver) {
 	signalChannel := make(chan os.Signal, 2)
 	signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
 	<-signalChannel
@@ -62,7 +62,9 @@ func watchForShutdown(pwm *pwmDriver, hbridges ...*gpio.LedDriver) {
 	for _, hbridge := range hbridges {
 		hbridge.Off()
 	}
-	pwm.Stop()
+	for _, pwm := range pwms {
+		pwm.Stop()
+	}
 	fmt.Println("Finished")
 	os.Exit(0)
 }

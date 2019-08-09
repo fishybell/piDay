@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -65,6 +66,7 @@ func (p *pwmDriver) Stop() {
 }
 
 func (p *pwmDriver) SetDutyCycle(numTicks int) {
+	fmt.Println("setting duty cycle to", numTicks)
 	if numTicks < 0 {
 		panic("can't have a negative duty cycle")
 	}
