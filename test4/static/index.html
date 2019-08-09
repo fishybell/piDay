@@ -57,8 +57,7 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
-//var address = `${window.location.protocol}//${window.location.hostname}:3000`
-var address = 'http://localhost:3000'
+var address = `${window.location.protocol}//${window.location.hostname}:3000`
 var slider1 = document.getElementById("myRange1");
 var output1 = document.getElementById("demo1");
 output1.innerHTML = slider1.value;
@@ -66,10 +65,17 @@ output1.innerHTML = slider1.value;
 slider1.oninput = function() {
   output1.innerHTML = this.value;
   var data = {
-    "speed1": this.value
+    "slider": 1,
+    "speed": this.value
   };
-  $.post(`${address}/api/robots/hello/commands/hi_there`, data, function(data, status) {
-    console.log(`${data} with ${status}`)
+  var headers = {
+    'Content-Type': 'application/json',
+  }
+  var url = `${address}/api/robots/hello/commands/speed`
+
+  // jquery wants to make these url parameters...which doesn't work with gobot
+  $.post(url, JSON.stringify(data), function(data, status) {
+    console.log(`${JSON.stringify(data)} with ${status}`)
   });
 }
 
