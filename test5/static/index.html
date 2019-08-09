@@ -41,14 +41,14 @@
 </head>
 <body>
 
-<h1>Custom Range Slider</h1>
-<p>Drag the slider to display the current value.</p>
+<p>Left</p>
 
 <div class="slidecontainer">
   <input type="range" min="-100" max="100" value="0" class="slider" id="myRange1">
   <p>Value: <span id="demo1"></span></p>
 </div>
 
+<p>Right</p>
 
 <div class="slidecontainer">
   <input type="range" min="-100" max="100" value="0" class="slider" id="myRange2">
@@ -57,16 +57,31 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
-var address = `${window.location.protocol}//${window.location.hostname}:3000`
-var slider1 = document.getElementById("myRange1");
-var output1 = document.getElementById("demo1");
-output1.innerHTML = slider1.value;
 
-slider1.oninput = function() {
-  output1.innerHTML = this.value;
+// stolen blatently from https://davidwalsh.name/javascript-debounce-function
+// Returns a function, that, as long as it continues to be invoked, will not
+// be triggered. The function will be called after it stops being called for
+// N milliseconds. If `immediate` is passed, trigger the function on the
+// leading edge, instead of the trailing.
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
+
+function sendSpeed(speed, slider) {
   var data = {
     "slider": 1,
-    "speed": this.value
+    "speed": speed
   };
   var headers = {
     'Content-Type': 'application/json',
@@ -77,6 +92,18 @@ slider1.oninput = function() {
   $.post(url, JSON.stringify(data), function(data, status) {
     console.log(`${JSON.stringify(data)} with ${status}`)
   });
+};
+
+var speedSend = debounce(sendSpeed, 15, false)
+
+var address = `${window.location.protocol}//${window.location.hostname}:3000`
+var slider1 = document.getElementById("myRange1");
+var output1 = document.getElementById("demo1");
+output1.innerHTML = slider1.value;
+
+slider1.oninput = function() {
+  output1.innerHTML = this.value;
+  speedSend(this.value, 1)
 }
 
 var slider2 = document.getElementById("myRange2");
@@ -85,6 +112,7 @@ output2.innerHTML = slider2.value;
 
 slider2.oninput = function() {
   output2.innerHTML = this.value;
+  speedSend(this.value, 2)
 }
 
 </script>

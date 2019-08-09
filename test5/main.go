@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -32,9 +31,12 @@ func main() {
 
 	// define our motors
 
-	motors := []Motor{
+	motors := []Motor{ // the order matters, because it does
 		NewFakeMotor(), // you hack!
-		NewMotor(pwm, hbridge1_a, hbridge1_b),
+		NewMotor(pwm, hbridge1_a, hbridge1_b, "front left"),
+		NewMotor(pwm, hbridge1_a, hbridge1_b, "front right"),
+		NewMotor(pwm, hbridge1_a, hbridge1_b, "back left"),
+		NewMotor(pwm, hbridge1_a, hbridge1_b, "back right"),
 	}
 
 	// define our commands
@@ -43,16 +45,8 @@ func main() {
 	car.AddCommand("speed", func(params map[string]interface{}) interface{} {
 		speed := parseInt(params, "speed")
 		slider := parseInt(params, "slider")
-		fmt.Println("got speed command", speed, slider)
-
-		if speed < 0 {
-			motors[slider].Back()
-			motors[slider].Speed(-1 * speed)
-		} else {
-			motors[slider].Fwd()
-			motors[slider].Speed(speed)
-		}
-		return handleSpeed(speed, slider)
+		handleSpeed(motors, speed, slider)
+		return "stuff"
 	})
 
 	// server our static directory
