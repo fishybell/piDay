@@ -128,7 +128,8 @@ function sendSpeed(speed, slider) {
   });
 };
 
-(function poll() {
+// wouldn't it be nice if we knew when our car was on? oh wait...
+(function pollStatus() {
   var url = `${address}/api/robots/car/commands/status`
   var headers = {
     'Content-Type': 'application/json',
@@ -147,7 +148,7 @@ function sendSpeed(speed, slider) {
             lightbox.style.backgroundColor = color1;
           },
           dataType: "json",
-          complete: poll,
+          complete: pollStatus,
           timeout: 2000
       })
   }, 1000);
@@ -188,6 +189,22 @@ slider2.onpointerup = function() {
 }
 slider2.addEventListener("touchend", slider2.onpointerup, false);
 
+// sometimes our debounce is crap and leaves the wheels on
+var lastValue1 = -999;
+var lastValue2 = -999;
+(function pollSpeed() {
+  setTimeout(function() {
+    if (lastValue1 != slider1.value) {
+      sendSpeed(slider1.value, 1)
+      lastValue1 = slider1.value
+    }
+    if (lastValue2 != slider2.value) {
+      sendSpeed(slider2.value, 2)
+      lastValue2 = slider2.value
+    }
+    pollSpeed()
+  }, 200);
+})();
 
 </script>
 
