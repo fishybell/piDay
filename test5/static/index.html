@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="MobileOptimized" content="640">
 <style>
 .slidecontainer {
   width: 100%;
@@ -9,13 +10,26 @@
 
 .slider {
   -webkit-appearance: none;
-  width: 100%;
-  height: 25px;
+  width: 80%;
+  height: 50px;
   background: #d3d3d3;
   outline: none;
   opacity: 0.7;
   -webkit-transition: .2s;
   transition: opacity .2s;
+  display: block;
+  margin: auto;
+}
+
+.lightbox {
+  width: 50px;
+  height: 50px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity .2s;
+  display: block;
+  margin: auto;
 }
 
 .slider:hover {
@@ -25,8 +39,8 @@
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 25px;
-  height: 25px;
+  width: 50px;
+  height: 50px;
   background: #4CAF50;
   cursor: pointer;
 }
@@ -41,17 +55,37 @@
 </head>
 <body>
 
-<p>Left</p>
+<p>Lefty</p>
 
 <div class="slidecontainer">
-  <input type="range" min="-100" max="100" value="0" class="slider" id="myRange1">
+  <input type="range" min="-100" max="100" value="0" class="slider" id="myRange1"/>
   <p>Value: <span id="demo1"></span></p>
 </div>
 
-<p>Right</p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<div class="lightbox" id="lightbox1"></div>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+<p>Righty</p>
 
 <div class="slidecontainer">
-  <input type="range" min="-100" max="100" value="0" class="slider" id="myRange2">
+  <input type="range" min="-100" max="100" value="0" class="slider" id="myRange2"/>
   <p>Value: <span id="demo2"></span></p>
 </div>
 
@@ -94,6 +128,31 @@ function sendSpeed(speed, slider) {
   });
 };
 
+(function poll() {
+  var url = `${address}/api/robots/car/commands/status`
+  var headers = {
+    'Content-Type': 'application/json',
+  }
+  var lightbox = document.getElementById("lightbox1");
+  var color1 = "rgb(175, 76, 80)"; // greenish
+  var color2 = "rgb(76, 175, 80)"; // redish
+  setTimeout(function() {
+      $.ajax({
+          url,
+          type: "POST",
+          success: function(data) {
+            lightbox.style.backgroundColor = color2;
+          },
+          error: function(data) {
+            lightbox.style.backgroundColor = color1;
+          },
+          dataType: "json",
+          complete: poll,
+          timeout: 2000
+      })
+  }, 1000);
+})();
+
 var speedSend = debounce(sendSpeed, 15, false)
 
 var address = `${window.location.protocol}//${window.location.hostname}:3000`
@@ -106,6 +165,13 @@ slider1.oninput = function() {
   speedSend(this.value, 1)
 }
 
+slider1.onpointerup = function() {
+  this.value = 0
+  output1.innerHTML = this.value;
+  sendSpeed(0, 1)
+}
+slider1.addEventListener("touchend", slider1.onpointerup, false);
+
 var slider2 = document.getElementById("myRange2");
 var output2 = document.getElementById("demo2");
 output2.innerHTML = slider2.value;
@@ -114,6 +180,14 @@ slider2.oninput = function() {
   output2.innerHTML = this.value;
   speedSend(this.value, 2)
 }
+
+slider2.onpointerup = function() {
+  this.value = 0
+  output2.innerHTML = this.value;
+  sendSpeed(0, 2)
+}
+slider2.addEventListener("touchend", slider2.onpointerup, false);
+
 
 </script>
 

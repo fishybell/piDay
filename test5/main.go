@@ -72,6 +72,10 @@ func main() {
 		return "stuff"
 	})
 
+	car.AddCommand("status", func(params map[string]interface{}) interface{} {
+		return "on"
+	})
+
 	// server our static directory
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
