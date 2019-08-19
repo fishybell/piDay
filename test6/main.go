@@ -76,6 +76,16 @@ func main() {
 		return "on"
 	})
 
+	car.AddCommand("fail", func(params map[string]interface{}) interface{} {
+		fail()
+		return "on"
+	})
+
+	car.AddCommand("succeed", func(params map[string]interface{}) interface{} {
+		succeed()
+		return "on"
+	})
+
 	// server our static directory
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))

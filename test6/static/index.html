@@ -71,7 +71,11 @@
 <br/>
 <br/>
 <br/>
+<div>
+<div class="lightbox" id="button1"></div>
 <div class="lightbox" id="lightbox1"></div>
+<div class="lightbox" id="button2"></div>
+</div>
 <br/>
 <br/>
 <br/>
@@ -205,6 +209,38 @@ var lastValue2 = -999;
     pollSpeed()
   }, 200);
 })();
+
+var button1 = document.getElementById("button1");
+button1.onclick = function() {
+  var data = {
+    "winning": false,
+  };
+  var headers = {
+    'Content-Type': 'application/json',
+  }
+  var url = `${address}/api/robots/car/commands/fail`
+
+  // jquery wants to make these url parameters...which doesn't work with gobot
+  $.post(url, JSON.stringify(data), function(data, status) {
+    console.log(`${JSON.stringify(data)} with ${status}`)
+  });
+}
+
+var button2 = document.getElementById("button2");
+button2.onclick = function() {
+  var data = {
+    "winning": true,
+  };
+  var headers = {
+    'Content-Type': 'application/json',
+  }
+  var url = `${address}/api/robots/car/commands/succeed`
+
+  // jquery wants to make these url parameters...which doesn't work with gobot
+  $.post(url, JSON.stringify(data), function(data, status) {
+    console.log(`${JSON.stringify(data)} with ${status}`)
+  });
+}
 
 </script>
 

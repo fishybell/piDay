@@ -9,7 +9,7 @@ copy:
 	scp -P 20 app pi@192.168.43.124:~/
 
 notes:
-	scp -P 20 notes.txt pwm-notes.py pi@192.168.43.124:~/
+	scp -P 20 notes.txt *.py pi@192.168.43.124:~/
 
 static:
 	scp -P 20 static/* pi@192.168.43.124:~/static
