@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math"
 	"net/http"
 	"time"
 
@@ -12,6 +13,17 @@ import (
 )
 
 func main() {
+	speeds1 := speedS()
+	speeds2 := speedMap3()
+	blended := blendMaps(speeds1, speeds2, 0.4, 1.6)
+	speeds2AndSome := speedMap3AndSome()
+	blendedAndSome := blendMaps(speeds1, speeds2AndSome, 0.4, 1.6)
+	//tightened := tighten(blended, 5, 5)
+	for i := -100; i < 101; i++ {
+		log.Printf("%d : %d v %d v %d v %d", i, speeds1[i], speeds2[i], blended[i])
+	}
+	//return
+
 	master := gobot.NewMaster()
 
 	// start the api server
@@ -61,6 +73,14 @@ func main() {
 		NewMappedMotor(pwm2, speedMap3(), hbridge2_a, hbridge2_b, "back left"),
 		NewMappedMotor(pwm3, speedMap3(), hbridge3_a, hbridge3_b, "back right"),
 	}
+
+	//motors := []Motor{ // the order matters, because it does
+	//	NewFakeMotor(), // you hack!
+	//	NewMappedMotor(pwm1, blended, hbridge1_a, hbridge1_b, "front left"),
+	//	NewMappedMotor(pwm4, blendedAndSome, hbridge4_a, hbridge4_b, "front right"), // some idiot poured hot glue on this motor, give it a fighting chance
+	//	NewMappedMotor(pwm2, blended, hbridge2_a, hbridge2_b, "back left"),
+	//	NewMappedMotor(pwm3, blended, hbridge3_a, hbridge3_b, "back right"),
+	//}
 
 	// define our commands
 	car := master.AddRobot(gobot.NewRobot("car"))
@@ -146,3 +166,44 @@ func speedMap3AndSome() map[int]int {
 
 	return myMap
 }
+
+// map of a sigmoid "s-curve"
+func speedS() map[int]int {
+	myMap := make(map[int]int, 201) // -100 to 100
+	for i := 0; i < 201; i++ {
+		key := float64(i - 100)
+		partA := 1.0 / (1.0 + math.Pow(math.E, (-1.0*(key/20.0))))
+		partB := (math.Pow(math.E, (key / 20.0))) / (1.0 + math.Pow(math.E, (key/20.0)))
+		partC := ((partA + partB) * 100.0) - 100.0
+		myMap[int(key)] = int(partC)
+	}
+
+	return myMap
+}
+
+func blendMaps(map1, map2 map[int]int, weight1, weight2 float64) map[int]int {
+	myMap := make(map[int]int, 201) // -100 to 100
+	for i := 0; i < 201; i++ {
+		myMap[i] = int(((float64(map1[i]) * weight1) + (float64(map2[i]) * weight2)) / 2.0)
+	}
+
+	return myMap
+}
+
+//func tighten(speedMap map[int]int, dropFirst, dropLast int) map[int]int {
+//	myMap := make(map[int]int, 201) // -100 to 100
+//	for i := 0; i < 201; i++ {
+//		key := float64(i - 100)
+//		if key < 0.0 && key > -50 {
+//			// -50 to -1
+//		} else if key < 0.0 {
+//			// -100 to -51
+//		} else if key > 50.0 {
+//			// 51 to 100
+//		} else if key > 0.0 {
+//			// 1 to 51
+//		} // f you zero, you stay where you are
+//	}
+//
+//	return myMap
+//}
