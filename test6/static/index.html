@@ -51,6 +51,10 @@
   background: #4CAF50;
   cursor: pointer;
 }
+
+#vidya {
+   transform: rotate(90deg);
+}
 </style>
 </head>
 <body>
@@ -71,6 +75,9 @@
 <br/>
 <br/>
 <br/>
+<div>
+  <iframe src="demo_iframe.htm" height="200" width="300" id="vidya"></iframe>
+</div>
 <div>
 <div class="lightbox" id="button1"></div>
 <div class="lightbox" id="lightbox1"></div>
@@ -161,6 +168,7 @@ function sendSpeed(speed, slider) {
 var speedSend = debounce(sendSpeed, 15, true)
 
 var address = `${window.location.protocol}//${window.location.hostname}:3000`
+var address2 = `${window.location.protocol}//${window.location.hostname}:8080`
 var slider1 = document.getElementById("myRange1");
 var output1 = document.getElementById("demo1");
 output1.innerHTML = slider1.value;
@@ -241,6 +249,9 @@ button2.onclick = function() {
     console.log(`${JSON.stringify(data)} with ${status}`)
   });
 }
+
+var vidya = document.getElementById("vidya");
+vidya.src = `${address2}/stream`
 
 </script>
 
