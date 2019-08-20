@@ -17,7 +17,7 @@
   opacity: 0.7;
   -webkit-transition: .2s;
   transition: opacity .2s;
-  display: block;
+  display: flex;
   margin: auto;
 }
 
@@ -28,7 +28,6 @@
   outline: none;
   opacity: 0.7;
   transition: opacity .2s;
-  display: block;
   margin: auto;
 }
 
@@ -51,6 +50,45 @@
   background: #4CAF50;
   cursor: pointer;
 }
+  #boxbox {
+    display:flex;
+    justify-content: space-between;
+    height: 392px;
+  }
+
+  #boxbox_col_left {
+    flex-direction: column;
+  }
+  #boxbox_col_right {
+    flex-direction: column;
+  }
+  #boxbox_col_cnt {
+    align-self: center;
+  }
+
+  #bl {
+    background-color: azure;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 292px;
+  }
+  #br {
+    background-color: black;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 292px;
+  }
+  #fl {
+    background-color: blue;
+    width: 50px;
+    height: 50px;
+  }
+  #fr {
+    background-color: burlywood;
+    width: 50px;
+    height: 50px;
+  }
+
 </style>
 </head>
 <body>
@@ -62,29 +100,21 @@
   <p>Value: <span id="demo1"></span></p>
 </div>
 
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<div>
-<div class="lightbox" id="button1"></div>
-<div class="lightbox" id="lightbox1"></div>
-<div class="lightbox" id="button2"></div>
+<div id="boxbox">
+  <div id="boxbox_col_left">
+    <div id="bl"></div>
+    <div id="fl"></div>
+  </div>
+  <div id="boxbox_col_cnt">
+    <div class="lightbox" id="button1"></div>
+    <div class="lightbox" id="lightbox1"></div>
+    <div class="lightbox" id="button2"></div>
+  </div>
+  <div id="boxbox_col_right">
+    <div id="br"></div>
+    <div id="fr"></div>
+  </div>
 </div>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 
 <p>Righty</p>
 
@@ -158,7 +188,7 @@ function sendSpeed(speed, slider) {
   }, 1000);
 })();
 
-var speedSend = debounce(sendSpeed, 15, true)
+var speedSend = debounce(sendSpeed, 15, false)
 
 var address = `${window.location.protocol}//${window.location.hostname}:3000`
 var slider1 = document.getElementById("myRange1");
