@@ -13,16 +13,16 @@ import (
 )
 
 func main() {
-	speeds1 := speedS()
-	speeds2 := speedMap3()
-	blended := blendMaps(speeds1, speeds2, 0.4, 1.6)
-	speeds2AndSome := speedMap3AndSome()
-	blendedAndSome := blendMaps(speeds1, speeds2AndSome, 0.4, 1.6)
-	//tightened := tighten(blended, 5, 5)
-	for i := -100; i < 101; i++ {
-		log.Printf("%d : %d v %d v %d v %d", i, speeds1[i], speeds2[i], blended[i])
-	}
-	//return
+	//speeds1 := speedS()
+	//speeds2 := speedMap3()
+	//blended := blendMaps(speeds1, speeds2, 0.4, 1.6)
+	//speeds2AndSome := speedMap3AndSome()
+	//blendedAndSome := blendMaps(speeds1, speeds2AndSome, 0.4, 1.6)
+	////tightened := tighten(blended, 5, 5)
+	//for i := -100; i < 101; i++ {
+	//	log.Printf("%d : %d v %d v %d v %d", i, speeds1[i], speeds2[i], blended[i])
+	//}
+	////return
 
 	master := gobot.NewMaster()
 
@@ -138,7 +138,7 @@ func motorIO(r *raspi.Adaptor, pin1 string, pin2 string, pin3 string) (pwm *pwmD
 	led := gpio.NewLedDriver(r, pin1)
 	hbridge1 = gpio.NewLedDriver(r, pin2)
 	hbridge2 = gpio.NewLedDriver(r, pin3)
-	pwm = SoftPwmInit(led, 10*time.Nanosecond, 100)
+	pwm = SoftPwmInit(led, 25*time.Nanosecond, 100)
 	pwm.SetDutyCycle(0)
 	pwm.Start() // if we don't start, we hang on a channel forever
 

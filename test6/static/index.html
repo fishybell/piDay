@@ -197,7 +197,8 @@ output1.innerHTML = slider1.value;
 
 slider1.oninput = function() {
   output1.innerHTML = this.value;
-  speedSend(this.value, 1)
+  //speedSend(this.value, 1) no debouncing no more
+  sendSpeed(this.value, 1)
 }
 
 slider1.onpointerup = function() {
@@ -213,7 +214,8 @@ output2.innerHTML = slider2.value;
 
 slider2.oninput = function() {
   output2.innerHTML = this.value;
-  speedSend(this.value, 2)
+  //speedSend(this.value, 2) no debouncing no more
+  sendSpeed(this.value, 2)
 }
 
 slider2.onpointerup = function() {
