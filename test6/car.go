@@ -11,6 +11,8 @@ type Motor interface {
 	Back()
 	Speed(int64)
 	Name() string
+	Toggle()
+	Enabled() bool
 }
 
 func NewFakeMotor() Motor {
@@ -23,6 +25,7 @@ func NewMotor(speedController *pwmDriver, hbridge1 *gpio.LedDriver, hbridge2 *gp
 		hbridge1,
 		hbridge2,
 		name,
+		true,
 	}
 }
 
@@ -31,6 +34,7 @@ type carMotor struct {
 	hbridge1        *gpio.LedDriver
 	hbridge2        *gpio.LedDriver
 	name            string
+	enabled         bool
 }
 
 func (car *carMotor) Fwd() {
@@ -46,6 +50,10 @@ func (car *carMotor) Back() {
 }
 
 func (car *carMotor) Speed(speed int64) {
+	if !car.enabled {
+		// leave h-bridge, and pwm, as-is
+		return
+	}
 	if speed == 0 {
 		fmt.Println(car.name, "stopping")
 		car.hbridge1.Off()
@@ -54,6 +62,14 @@ func (car *carMotor) Speed(speed int64) {
 		fmt.Printf("%s going %d\n", car.name, speed)
 		car.speedController.SetDutyCycle(int(speed))
 	}
+}
+
+func (car *carMotor) Toggle() {
+	car.enabled = !car.enabled
+}
+
+func (car *carMotor) Enabled() bool {
+	return car.enabled
 }
 
 func (car *carMotor) Name() string {
@@ -67,6 +83,7 @@ func NewMappedMotor(speedController *pwmDriver, speedMap map[int]int, hbridge1 *
 		hbridge2,
 		name,
 		speedMap,
+		true,
 	}
 }
 
@@ -76,6 +93,7 @@ type mappedMotor struct {
 	hbridge2        *gpio.LedDriver
 	name            string
 	speedMap        map[int]int
+	enabled         bool
 }
 
 func (car *mappedMotor) Fwd() {
@@ -118,6 +136,13 @@ func (*nullMotor) Back() {
 func (*nullMotor) Speed(int64) {
 }
 
+func (*nullMotor) Toggle() {
+}
+
+func (*nullMotor) Enabled() bool {
+	return false
+}
+
 func (*nullMotor) Name() string {
 	return "you should never see this"
 }
@@ -139,4 +164,12 @@ func handleSpeed(motors []Motor, speed int64, slider int64) string {
 		motors[slider+2].Speed(speed)
 	}
 	return fmt.Sprintf("received speed %d for slider %d", speed, slider)
+}
+
+func (car *mappedMotor) Toggle() {
+	car.enabled = !car.enabled
+}
+
+func (car *mappedMotor) Enabled() bool {
+	return car.enabled
 }

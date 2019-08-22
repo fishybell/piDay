@@ -76,12 +76,12 @@
     background-color: black;
     width: 50px;
     height: 50px;
-    margin-bottom: 292px;
   }
   #fl {
     background-color: blue;
     width: 50px;
     height: 50px;
+    margin-bottom: 292px;
   }
   #fr {
     background-color: burlywood;
@@ -103,7 +103,7 @@
 <div id="boxbox">
   <div id="boxbox_col_left">
     <div id="bl"></div>
-    <div id="fl"></div>
+    <div id="br"></div>
   </div>
   <div id="boxbox_col_cnt">
     <div class="lightbox" id="button1"></div>
@@ -111,7 +111,7 @@
     <div class="lightbox" id="button2"></div>
   </div>
   <div id="boxbox_col_right">
-    <div id="br"></div>
+    <div id="fl"></div>
     <div id="fr"></div>
   </div>
 </div>
@@ -125,6 +125,8 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
+
+var address = `${window.location.protocol}//${window.location.hostname}:3000`
 
 // stolen blatently from https://davidwalsh.name/javascript-debounce-function
 // Returns a function, that, as long as it continues to be invoked, will not
@@ -146,6 +148,90 @@ function debounce(func, wait, immediate) {
 	};
 };
 
+// wouldn't it be nice if we knew when our car was on? oh wait...
+var colorOff = "rgb(175, 76, 80)"; // redish
+var colorOn = "rgb(76, 175, 80)"; // greenish
+(function pollStatus() {
+  var url = `${address}/api/robots/car/commands/status`
+  var headers = {
+    'Content-Type': 'application/json',
+  }
+  var lightbox = document.getElementById("lightbox1");
+  setTimeout(function() {
+      $.ajax({
+          url,
+          type: "POST",
+          success: function(data) {
+            lightbox.style.backgroundColor = colorOn;
+          },
+          error: function(data) {
+            lightbox.style.backgroundColor = colorOff;
+          },
+          dataType: "json",
+          complete: pollStatus,
+          timeout: 2000
+      })
+  }, 1000);
+})();
+
+function toggleCommand(cmd) {
+  var data = {
+    "doesn't": "matter",
+  };
+  var headers = {
+    'Content-Type': 'application/json',
+  }
+  var url = `${address}/api/robots/car/commands/${cmd}`
+
+  // jquery wants to make these url parameters...which doesn't work with gobot
+  $.post(url, JSON.stringify(data), function(data, status) {
+    console.log(`${cmd} with ${status}`)
+  });
+}
+
+var button1 = document.getElementById("button1");
+button1.onclick = function() {
+  toggleCommand("fail");
+}
+
+var button2 = document.getElementById("button2");
+button2.onclick = function() {
+  toggleCommand("succeed");
+}
+
+var buttonFL = document.getElementById("fl");
+buttonFL.onclick = function() {
+  toggleCommand("flToggle");
+}
+
+var buttonFR = document.getElementById("fr");
+buttonFR.onclick = function() {
+  toggleCommand("frToggle");
+}
+
+var buttonBL = document.getElementById("bl");
+buttonBL.onclick = function() {
+  toggleCommand("blToggle");
+}
+
+var buttonBR = document.getElementById("br");
+buttonBR.onclick = function() {
+  toggleCommand("brToggle");
+}
+
+buttonFL.style.backgroundColor = colorOff;
+buttonFR.style.backgroundColor = colorOff;
+buttonBL.style.backgroundColor = colorOff;
+buttonBR.style.backgroundColor = colorOff;
+function setToggles(data) {
+  console.log('something something something', data)
+  datas = JSON.parse(data) //what?
+  buttonFL.style.backgroundColor = datas.result.fl ? colorOn : colorOff;
+  buttonFR.style.backgroundColor = datas.result.fr ? colorOn : colorOff;
+  buttonBL.style.backgroundColor = datas.result.bl ? colorOn : colorOff;
+  buttonBR.style.backgroundColor = datas.result.br ? colorOn : colorOff;
+};
+
 function sendSpeed(speed, slider) {
   var data = {
     "slider": slider,
@@ -159,38 +245,12 @@ function sendSpeed(speed, slider) {
   // jquery wants to make these url parameters...which doesn't work with gobot
   $.post(url, JSON.stringify(data), function(data, status) {
     console.log(`${JSON.stringify(data)} with ${status}`)
+    setToggles(data)
   });
 };
 
-// wouldn't it be nice if we knew when our car was on? oh wait...
-(function pollStatus() {
-  var url = `${address}/api/robots/car/commands/status`
-  var headers = {
-    'Content-Type': 'application/json',
-  }
-  var lightbox = document.getElementById("lightbox1");
-  var color1 = "rgb(175, 76, 80)"; // greenish
-  var color2 = "rgb(76, 175, 80)"; // redish
-  setTimeout(function() {
-      $.ajax({
-          url,
-          type: "POST",
-          success: function(data) {
-            lightbox.style.backgroundColor = color2;
-          },
-          error: function(data) {
-            lightbox.style.backgroundColor = color1;
-          },
-          dataType: "json",
-          complete: pollStatus,
-          timeout: 2000
-      })
-  }, 1000);
-})();
-
 var speedSend = debounce(sendSpeed, 15, false)
 
-var address = `${window.location.protocol}//${window.location.hostname}:3000`
 var slider1 = document.getElementById("myRange1");
 var output1 = document.getElementById("demo1");
 output1.innerHTML = slider1.value;
@@ -225,54 +285,25 @@ slider2.onpointerup = function() {
 }
 slider2.addEventListener("touchend", slider2.onpointerup, false);
 
-// sometimes our debounce is crap and leaves the wheels on
-var lastValue1 = -999;
-var lastValue2 = -999;
-(function pollSpeed() {
-  setTimeout(function() {
-    if (lastValue1 != slider1.value) {
-      sendSpeed(slider1.value, 1)
-      lastValue1 = slider1.value
-    }
-    if (lastValue2 != slider2.value) {
-      sendSpeed(slider2.value, 2)
-      lastValue2 = slider2.value
-    }
-    pollSpeed()
-  }, 200);
-})();
+//// sometimes our debounce is crap and leaves the wheels on
+//var lastValue1 = -999;
+//var lastValue2 = -999;
+//(function pollSpeed() {
+//  setTimeout(function() {
+//    if (lastValue1 != slider1.value) {
+//      sendSpeed(slider1.value, 1)
+//      lastValue1 = slider1.value
+//    }
+//    if (lastValue2 != slider2.value) {
+//      sendSpeed(slider2.value, 2)
+//      lastValue2 = slider2.value
+//    }
+//    pollSpeed()
+//  }, 200);
+//})();
 
-var button1 = document.getElementById("button1");
-button1.onclick = function() {
-  var data = {
-    "winning": false,
-  };
-  var headers = {
-    'Content-Type': 'application/json',
-  }
-  var url = `${address}/api/robots/car/commands/fail`
-
-  // jquery wants to make these url parameters...which doesn't work with gobot
-  $.post(url, JSON.stringify(data), function(data, status) {
-    console.log(`${JSON.stringify(data)} with ${status}`)
-  });
-}
-
-var button2 = document.getElementById("button2");
-button2.onclick = function() {
-  var data = {
-    "winning": true,
-  };
-  var headers = {
-    'Content-Type': 'application/json',
-  }
-  var url = `${address}/api/robots/car/commands/succeed`
-
-  // jquery wants to make these url parameters...which doesn't work with gobot
-  $.post(url, JSON.stringify(data), function(data, status) {
-    console.log(`${JSON.stringify(data)} with ${status}`)
-  });
-}
+sendSpeed(0,1);
+sendSpeed(0,2);
 
 </script>
 

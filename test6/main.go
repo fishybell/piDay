@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"math"
 	"net/http"
@@ -89,11 +90,11 @@ func main() {
 		speed := parseInt(params, "speed")
 		slider := parseInt(params, "slider")
 		handleSpeed(motors, speed, slider)
-		return "stuff"
+		return toggleStatus(motors)
 	})
 
 	car.AddCommand("status", func(params map[string]interface{}) interface{} {
-		return "on"
+		return toggleStatus(motors)
 	})
 
 	car.AddCommand("fail", func(params map[string]interface{}) interface{} {
@@ -188,6 +189,22 @@ func blendMaps(map1, map2 map[int]int, weight1, weight2 float64) map[int]int {
 	}
 
 	return myMap
+}
+
+func toggleStatus(motors []Motor) string {
+	toggles := struct {
+		FL bool `json:"fl"`
+		FR bool `json:"fr"`
+		BL bool `json:"bl"`
+		BR bool `json:"br"`
+	}{
+		motors[1].Enabled(),
+		motors[2].Enabled(),
+		motors[3].Enabled(),
+		motors[4].Enabled(),
+	}
+	bytes, _ := json.Marshal(toggles)
+	return string(bytes)
 }
 
 //func tighten(speedMap map[int]int, dropFirst, dropLast int) map[int]int {
